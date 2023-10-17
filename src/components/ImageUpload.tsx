@@ -1,0 +1,65 @@
+import React from "react";
+// import Compressor from "compressorjs";
+
+interface ImageUploadProps {
+  selectedImage: string | null;
+  setSelectedImage: React.Dispatch<React.SetStateAction<string | null>>;
+  setEditUpload: React.Dispatch<React.SetStateAction<boolean>>;
+}
+
+const ImageUpload = ({
+  selectedImage,
+  setSelectedImage,
+  setEditUpload,
+}: ImageUploadProps) => {
+  // if (selectedImage?.startsWith("http://")) {
+  //   selectedImage.replace("http://localhost:5173", "data:image/jpeg;base64,");
+  // }
+
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        // When the reader finishes reading the file, set the base64 string to the state
+        setSelectedImage(reader.result as string);
+      };
+      reader.readAsDataURL(file); // Read the file as data URL (base64 encoded)
+    } else {
+      setSelectedImage(null);
+    }
+  };
+
+  return (
+    <div className="bg-slate-100 mt-10 mx-auto min-w-[75vw] min-h-[50vh] flex gap-2 justify-center items-center rounded-xl shadow-lg">
+      <input
+        type="file"
+        accept="image/*"
+        onChange={handleImageChange}
+        className="rounded-lg p-4"
+      />
+      {selectedImage && (
+        <img
+          // src={
+          //   selectedImage.startsWith("data:image")
+          //     ? selectedImage
+          //     : `data:image/jpeg;base64,${selectedImage}`
+          // }
+          src={selectedImage}
+          alt="Selected"
+          className="rounded-lg lg:w-[15vw] lg:h-[25vh] md:w-[20vw] md:h-[20vh] p-4"
+        />
+      )}
+      {selectedImage && (
+        <button
+          onClick={() => setEditUpload(true)}
+          className="bg-green-400 rounded-lg text-black p-2 w-30 h-10 hover:bg-green-500"
+        >
+          Add features
+        </button>
+      )}
+    </div>
+  );
+};
+
+export default ImageUpload;
