@@ -1,7 +1,10 @@
+import { useEffect, useState } from "react";
 import DownloadDataSets from "../components/DownloadDataSets";
 import Chart from "react-apexcharts";
+import axios from "axios";
 
 export default function Dashboard({ dataSets }: { dataSets: any }) {
+  const [stats, setStats] = useState<any>([]);
   const series = [
     {
       name: "Text",
@@ -13,22 +16,38 @@ export default function Dashboard({ dataSets }: { dataSets: any }) {
     },
   ];
 
+  const fetchDataStats = async () => {
+    try {
+      const response = await axios.get("http://localhost:3000/users/stats");
+      const data = response.data;
+      setStats(data);
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  useEffect(() => {
+    fetchDataStats();
+  }, []);
+
+  // console.log(stats);
+
   return (
-    <div className="border-2 border-b-gray-600">
+    <div>
       <div className="p-6">
         <h1 className="text-4xl font-bold">Statistics</h1>
         <div className="flex justify-center items-center gap-40 mt-20">
           <div className="flex flex-col gap-2 bg-slate-300 rounded-lg shadow-lg p-4">
             <p className="text-xl font-bold">Total Data Sets</p>
-            <p className="text-3xl font-bold">10</p>
+            <p className="text-3xl font-bold">{stats.totalDatasets}</p>
           </div>
           <div className="flex flex-col gap-2 bg-slate-300 rounded-lg shadow-lg p-4">
             <p className="text-xl font-bold">Total Data Features</p>
-            <p className="text-3xl font-bold">100</p>
+            <p className="text-3xl font-bold">{stats.totalFeatures}</p>
           </div>
           <div className="flex flex-col gap-2 bg-slate-300 rounded-lg shadow-lg p-4">
             <p className="text-xl font-bold">Number of Users</p>
-            <p className="text-3xl font-bold">5</p>
+            <p className="text-3xl font-bold">{stats.numberOfUsers}</p>
           </div>
         </div>
         <div className="flex justify-center items-center mt-20">

@@ -1,45 +1,56 @@
+import axios from "axios";
 import { useState, FormEvent } from "react";
 import { useNavigate } from "react-router";
 
 interface LoginProps {
-  setIsAuthenticated: (value: boolean) => void;
-  setRole: (value: number) => void;
+  setToken: (token: string) => void;
 }
 
-const Login = ({ setIsAuthenticated, setRole }: LoginProps) => {
+const Login = ({ setToken }: LoginProps) => {
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [emailError, setEmailError] = useState(false);
 
-  const usersList = [
-    {
-      email: "manju",
-      password: "bochum",
-      role: 0,
-    },
-    {
-      email: "test",
-      password: "test",
-      role: 1,
-    },
-  ];
+  // const usersList = [
+  //   {
+  //     email: "manju",
+  //     password: "bochum",
+  //     role: 0,
+  //   },
+  //   {
+  //     email: "test",
+  //     password: "test",
+  //     role: 1,
+  //   },
+  // ];
 
-  const handleLogin = (event: FormEvent<HTMLFormElement>) => {
+  const handleLogin = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
       setEmailError(true);
-    }
-    usersList.forEach((user) => {
-      if (user.email === email && user.password === password) {
-        navigate("/dashboard");
-        setIsAuthenticated(true);
-        setRole(user.role);
+    } else {
+      try {
+        const response = await axios.post("http://localhost:3000/users/login", {
+          email: email,
+          password: password,
+        });
+        const data = response.data;
+        if (response.status === 200) {
+          navigate("/dashboard");
+          setToken(data.token);
+          localStorage.setItem("token", data.token);
+          localStorage.setItem("userInfo", email.split("@")[0]);
+        } else {
+          alert("Invalid credentials");
+        }
+      } catch (err) {
+        console.log(err);
       }
-    });
-    // console.log(email, password);
+    }
   };
+  //localStorage.setItem("userInfo", JSON.stringify(email.split("@")[0]));
 
   return (
     <div className="flex flex-col justify-center items-center bg-gradient-to-l from-cyan-500 to-blue-500 h-screen">

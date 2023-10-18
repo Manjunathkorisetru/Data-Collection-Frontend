@@ -1,11 +1,6 @@
 import { Link, useLocation } from "react-router-dom";
-import { Dispatch, SetStateAction } from "react";
 
-type NavbarProps = {
-  setIsAuthenticated: Dispatch<SetStateAction<boolean>>;
-};
-
-function Navbar({ setIsAuthenticated }: NavbarProps) {
+function Navbar() {
   const location = useLocation();
 
   return (
@@ -51,7 +46,8 @@ function Navbar({ setIsAuthenticated }: NavbarProps) {
           to="/"
           className="hover:text-red-700"
           onClick={() => {
-            setIsAuthenticated(false);
+            localStorage.removeItem("token");
+            localStorage.removeItem("userInfo");
           }}
         >
           Logout

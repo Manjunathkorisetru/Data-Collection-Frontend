@@ -12,10 +12,6 @@ const ImageUpload = ({
   setSelectedImage,
   setEditUpload,
 }: ImageUploadProps) => {
-  // if (selectedImage?.startsWith("http://")) {
-  //   selectedImage.replace("http://localhost:5173", "data:image/jpeg;base64,");
-  // }
-
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {

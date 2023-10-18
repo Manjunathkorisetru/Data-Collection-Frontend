@@ -7,6 +7,8 @@ import DatePickerComponent from "../components/DatePickerComponent";
 // import { postImage } from "../apicalls";
 
 import axios from "axios";
+import Banner from "../components/Banner";
+import LoadingStatus from "../components/LoadingStatus";
 
 // interface Features {
 //   value: string | Date | null;
@@ -39,6 +41,9 @@ function Upload({
   const [editUpload, setEditUpload] = useState(false);
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [existingDataId, setExistingDataId] = useState<string | null>(null);
+  const [showUploadBanner, setShowUploadBanner] = useState(false);
+  const [showUpdateBanner, setShowUpdateBanner] = useState(false);
+  const userInfo = localStorage.getItem("userInfo");
 
   interface Feature {
     value: string | Date | null;
@@ -60,13 +65,15 @@ function Upload({
         "http://localhost:3000/users/delete",
         {
           data: {
-            email: "manjukori@outlook.com",
+            email: `${userInfo}@gmail.com`,
             id: id,
           },
         }
       );
       if (response.status === 201) {
-        window.location.reload();
+        setTimeout(() => {
+          window.location.reload();
+        }, 4000);
       }
     } catch (err) {
       console.log(err);
@@ -92,15 +99,29 @@ function Upload({
   const handleUpload = async ({ selectedImage }: { selectedImage: string }) => {
     if (existingDataId) {
       try {
-        const response = await axios.put("http://localhost:3000/users/update", {
-          email: "manjukori@outlook.com",
-          id: existingDataId,
-          features: features,
-        });
+        const response = await axios.put(
+          "http://localhost:3000/users/update",
+          {
+            email: `${userInfo}@gmail.com`,
+            id: existingDataId,
+            features: features,
+          },
+          {
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: "Bearer " + `${localStorage.getItem("token")}`,
+            },
+          }
+        );
         if (response.status === 201) {
+          setShowUpdateBanner(true);
+
           setTimeout(() => {
             window.location.reload();
           }, 3000);
+          setTimeout(() => {
+            setShowUpdateBanner(false);
+          }, 4000);
         }
       } catch (err) {
         console.log(err);
@@ -110,15 +131,26 @@ function Upload({
         const response = await axios.post(
           "http://localhost:3000/users/upload",
           {
-            email: "manjukori@outlook.com",
+            email: `${userInfo}@gmail.com`,
             image: selectedImage.split(",")[1],
             features: features,
+          },
+          {
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: "Bearer " + `${localStorage.getItem("token")}`,
+            },
           }
         );
         if (response.status === 201) {
+          setShowUploadBanner(true);
+
           setTimeout(() => {
             window.location.reload();
           }, 3000);
+          setTimeout(() => {
+            setShowUploadBanner(false);
+          }, 4000);
         }
       } catch (err) {
         console.log(err);
@@ -138,6 +170,8 @@ function Upload({
 
   return (
     <div className="flex flex-col justify-center items-center">
+      {showUploadBanner && <Banner msg="Uploaded" />}
+      {showUpdateBanner && <Banner msg="Updated" />}
       {editUpload && selectedImage !== null ? (
         <>
           <div
@@ -274,23 +308,29 @@ function Upload({
             if (selectedImage) {
               handleUpload({ selectedImage });
               getDataSets();
+              setEditUpload(false);
+              setSelectedImage(null);
             }
           }}
-          className="bg-green-400 rounded-lg text-black p-2 w-20 h-10
-                     hover:bg-green-800 hover:text-white shadow-xl mt-20"
+          className="bg-green-400 rounded-lg text-black px-4 py-2 
+                     hover:bg-green-800 hover:text-white shadow-xl mt-20 relative"
         >
           Upload
         </button>
       ) : null}
 
-      <PreviewDataSets
-        dataSets={dataSets}
-        setEditUpload={setEditUpload}
-        setSelectedImage={setSelectedImage}
-        setFeatures={setFeatures}
-        setExistingDataId={setExistingDataId}
-        handleDelete={handleDelete}
-      />
+      {dataSets.length > 0 ? (
+        <PreviewDataSets
+          dataSets={dataSets}
+          setEditUpload={setEditUpload}
+          setSelectedImage={setSelectedImage}
+          setFeatures={setFeatures}
+          setExistingDataId={setExistingDataId}
+          handleDelete={handleDelete}
+        />
+      ) : (
+        <LoadingStatus />
+      )}
     </div>
   );
 }

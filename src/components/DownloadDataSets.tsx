@@ -3,19 +3,23 @@ import { faCircleDown } from "@fortawesome/free-solid-svg-icons";
 import JSZip from "jszip";
 import Papa from "papaparse";
 
-interface DataSet {
-  id: number;
-  image: string;
-  features: { name: string; value: string; type: string }[];
-}
+// interface DataSet {
+//   id: number;
+//   image: string;
+//   features: { name: string; value: string; type: string }[];
+// }
 
-const downloadData = async (dataSet: DataSet) => {
+const downloadData = async (dataSet: any) => {
   const zip = new JSZip();
 
   const { id, image, features } = dataSet;
 
+  const base64Image = `data:image/jpeg;base64,${image}`;
+
   // Download images
-  const imageBlob = await fetch(image).then((response) => response.blob());
+  const imageBlob = await fetch(base64Image).then((response) =>
+    response.blob()
+  );
   zip.file(`image_${id}.jpg`, imageBlob);
 
   // Convert features to CSV
@@ -33,23 +37,21 @@ const downloadData = async (dataSet: DataSet) => {
   });
 };
 
-const downloadAll = async (dataSets: DataSet[]) => {
+const downloadAll = async (dataSets: any) => {
   const zip = new JSZip();
 
-  // Iterate over dataSets
   for (const dataSet of dataSets) {
     const { id, image, features } = dataSet;
-
-    // Download images
-    const imageBlob = await fetch(image).then((response) => response.blob());
+    const base64Image = `data:image/jpeg;base64,${image}`;
+    const imageBlob = await fetch(base64Image).then((response) =>
+      response.blob()
+    );
     zip.file(`image_${id}.jpg`, imageBlob);
 
-    // Convert features to CSV
     const csvData = Papa.unparse(features);
     zip.file(`features_${id}.csv`, csvData);
   }
 
-  // Generate the zip file
   zip.generateAsync({ type: "blob" }).then((content) => {
     const url = URL.createObjectURL(content);
     const a = document.createElement("a");
@@ -59,19 +61,26 @@ const downloadAll = async (dataSets: DataSet[]) => {
   });
 };
 
-function DownloadDataSets({ dataSets }: { dataSets: DataSet[] }) {
+function DownloadDataSets({ dataSets: initialDataSets }: { dataSets: any }) {
+  const data = initialDataSets.map((item: any) => {
+    const result = item.datasets.map((item: any) => {
+      return item;
+    });
+    return result;
+  });
+  const dataSets = data.flat();
   return (
     <div className="flex flex-col gap-4 w-screen h-screen ">
       <h1 className="text-3xl font-bold text-center mt-24">
         Download Data Sets
       </h1>
-      {dataSets.map((dataSet, index) => (
+      {dataSets.map((dataSet: any, index: number) => (
         <div
           key={index}
           className="flex justify-center gap-4 items-center mt-10"
         >
           <img
-            src={dataSet.image}
+            src={`data:image/jpeg;base64,${dataSet.image}`}
             alt="random"
             className="rounded-lg lg:w-[20vw] lg:h-[20vh] md:w-[20vw] md:h-[20vh]"
           />
@@ -84,17 +93,20 @@ function DownloadDataSets({ dataSets }: { dataSets: DataSet[] }) {
               className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 
   lg:grid-cols-3 gap-6 rounded-lg w-full h-full mt-8"
             >
-              {dataSet.features.map((feature, index) => (
-                <div
-                  key={index}
-                  className=" bg-blue-400 
+              {dataSet.features.map((feature: any, index: number) => {
+                const featureId = `f${index + 1}`;
+                return (
+                  <div
+                    key={feature._id}
+                    className=" bg-blue-400 
               p-2 rounded-lg h-10 "
-                >
-                  <p key={index}>
-                    {feature.name}: {feature.value}
-                  </p>
-                </div>
-              ))}
+                  >
+                    <p key={feature._id}>
+                      {featureId}:{feature.value}
+                    </p>
+                  </div>
+                );
+              })}
             </div>
           </div>
           <button onClick={() => downloadData(dataSet)}>

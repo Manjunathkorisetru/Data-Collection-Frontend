@@ -1,56 +1,55 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
-interface ProfileProps {
-  firstName: string;
-  lastName: string;
-  emailId: string;
-  role: number;
-}
-
-function Profile({
-  firstName: initialFirstName,
-  lastName: initialLastName,
-  emailId: initialEmailId,
-  role: initialRole,
-}: ProfileProps) {
-  const [isDarkMode, setIsDarkMode] = useState(false);
-  const [firstName, setFirstName] = useState(initialFirstName);
-  const [lastName, setLastName] = useState(initialLastName);
-  const [emailId, setEmailId] = useState(initialEmailId);
-  const [role, setRole] = useState(initialRole);
-
-  const toggleMode = () => {
-    setIsDarkMode(!isDarkMode);
-  };
+function Profile({ dataSets: initialDataSets }: { dataSets: any }) {
+  // const [isDarkMode, setIsDarkMode] = useState(false);
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [emailId, setEmailId] = useState("");
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     // TODO: Implement the logic to update the user profile
   };
 
+  const currentUser = `${localStorage.getItem("userInfo")}@gmail.com`;
+
+  const user = initialDataSets
+    .map((item: any) => {
+      return item.email === currentUser ? item : null;
+    })
+    .filter((item: any) => item !== null);
+
+  useEffect(() => {
+    setEmailId(user[0].email);
+    setFirstName(user[0].firstName);
+    setLastName(user[0].lastName);
+  }, [user]);
+
   return (
     <div
       className={`flex flex-col justify-center gap-4
-      h-screen border-10 border-b-black  items-center ${
-        isDarkMode ? "bg-gray-900 text-white" : "bg-white text-gray-900"
-      }`}
+      h-screen border-10 border-b-black  items-center bg-white text-gray-900`}
     >
-      <div
-        className="rounded-lg shadow-lg bg-blue-300 w-1/3 min-h-min mt-40
+      {user.length > 0 ? (
+        <div
+          className="rounded-lg shadow-lg bg-blue-300 w-1/3 min-h-min mt-40
       flex flex-col items-center gap-4"
-      >
-        <h1 className="text-4xl font-bold mt-4">{`${firstName} ${lastName}`}</h1>
-        <p className="text-lg">{`Email: ${emailId}`}</p>
-        <p className="text-lg">{`Role: ${role}`}</p>
-        <button
-          className={`mt-4 px-4 py-2 rounded-md mb-4 ${
-            isDarkMode ? "bg-white text-gray-900" : "bg-gray-900 text-white"
+        >
+          <h1 className="text-4xl font-bold mt-4">
+            {user[0].firstName} {user[0].lastName}
+          </h1>
+          <p className="text-lg">{`Email:${user[0].email}`}</p>
+          <p className="text-lg">{`Role:${user[0].role} `}</p>
+          {/* <button
+          className={`mt-4 px-4 py-2 rounded-md mb-4 bg-white text-gray-900
           }`}
-          onClick={toggleMode}
+          //onClick={toggleMode}
         >
           {isDarkMode ? "Switch to Light Mode" : "Switch to Dark Mode"}
-        </button>
-      </div>
+        </button> */}
+        </div>
+      ) : null}
+
       <form
         onSubmit={handleSubmit}
         className="w-2/3 min-h-min rounded-xl bg-blue-300 shadow-lg mb-10 "
@@ -104,20 +103,18 @@ function Profile({
           <label htmlFor="role" className="block font-medium text-black-700">
             Role
           </label>
-          <input
+          {/* <input
             id="role"
             type="number"
             value={role}
             onChange={(event) => setRole(parseInt(event.target.value))}
             className="w-[20vw] h-[5vh] p-4 rounded-lg border-gray-300 
             shadow-sm"
-          />
+          /> */}
         </div>
         <button
           type="submit"
-          className={`mt-4 px-4 py-2 rounded-md mb-10 ${
-            isDarkMode ? "bg-white text-gray-900" : "bg-gray-900 text-white"
-          }`}
+          className={`mt-4 px-4 py-2 rounded-md mb-10 bg-white text-gray-900`}
         >
           Save Changes
         </button>
