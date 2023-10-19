@@ -45,8 +45,6 @@ function App() {
   useEffect(() => {
     if (token) {
       getDataSets();
-    } else {
-      console.log("Token is empty");
     }
   }, [token]);
 
@@ -86,9 +84,7 @@ function App() {
 
         <Route
           path="/profile"
-          element={
-            token ? <ProfilePage dataSets={dataSets} /> : <Navigate to="/" />
-          }
+          element={token ? <ProfilePage /> : <Navigate to="/" />}
         />
       </Routes>
     </div>

@@ -27,7 +27,10 @@ const ImageUpload = ({
   };
 
   return (
-    <div className="bg-slate-100 mt-10 mx-auto min-w-[75vw] min-h-[50vh] flex gap-2 justify-center items-center rounded-xl shadow-lg">
+    <div
+      className="bg-slate-100 mx-auto min-w-[75vw] min-h-[50vh] flex gap-2 justify-center 
+    items-center rounded-xl shadow-lg mt-10"
+    >
       <input
         type="file"
         accept="image/*"

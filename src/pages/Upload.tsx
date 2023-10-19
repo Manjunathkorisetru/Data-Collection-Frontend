@@ -2,9 +2,10 @@ import { SetStateAction, useEffect, useState } from "react";
 import ImageUpload from "../components/ImageUpload";
 import PreviewDataSets from "../components/PreviewDataSets";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faTrashCan } from "@fortawesome/free-solid-svg-icons";
+import { faTrashCan, faXmark } from "@fortawesome/free-solid-svg-icons";
 import DatePickerComponent from "../components/DatePickerComponent";
 // import { postImage } from "../apicalls";
+import formatDate from "../utils/FormatDate";
 
 import axios from "axios";
 import Banner from "../components/Banner";
@@ -43,6 +44,9 @@ function Upload({
   const [existingDataId, setExistingDataId] = useState<string | null>(null);
   const [showUploadBanner, setShowUploadBanner] = useState(false);
   const [showUpdateBanner, setShowUpdateBanner] = useState(false);
+  const [showDeleteBanner, setShowDeleteBanner] = useState(false);
+  const [limitReached, setLimitReached] = useState(false);
+  const [charLimitReached, setCharLimitReached] = useState(false);
   const userInfo = localStorage.getItem("userInfo");
 
   interface Feature {
@@ -71,9 +75,14 @@ function Upload({
         }
       );
       if (response.status === 201) {
+        window.scrollTo(0, 0);
+        setShowDeleteBanner(true);
         setTimeout(() => {
           window.location.reload();
         }, 4000);
+        setTimeout(() => {
+          setShowDeleteBanner(false);
+        }, 3000);
       }
     } catch (err) {
       console.log(err);
@@ -88,7 +97,7 @@ function Upload({
         setFeatures([...features, { value: selectedDate, type: "Date" }]);
       }
     } else {
-      alert("You can't add more than 16 features");
+      setLimitReached(true);
     }
   };
 
@@ -115,10 +124,10 @@ function Upload({
         );
         if (response.status === 201) {
           setShowUpdateBanner(true);
-
+          window.scrollTo(0, 0);
           setTimeout(() => {
             window.location.reload();
-          }, 3000);
+          }, 4000);
           setTimeout(() => {
             setShowUpdateBanner(false);
           }, 4000);
@@ -144,10 +153,10 @@ function Upload({
         );
         if (response.status === 201) {
           setShowUploadBanner(true);
-
+          window.scrollTo(0, 0);
           setTimeout(() => {
             window.location.reload();
-          }, 3000);
+          }, 4000);
           setTimeout(() => {
             setShowUploadBanner(false);
           }, 4000);
@@ -168,10 +177,20 @@ function Upload({
     }
   }, [selectedOption]);
 
+  useEffect(() => {
+    if (featuresCount < 16) {
+      setLimitReached(false);
+    }
+    if (text.length >= 8) {
+      setCharLimitReached(true);
+    }
+  }, [features, text]);
+
   return (
     <div className="flex flex-col justify-center items-center">
       {showUploadBanner && <Banner msg="Uploaded" />}
       {showUpdateBanner && <Banner msg="Updated" />}
+      {showDeleteBanner && <Banner msg="Deleted" />}
       {editUpload && selectedImage !== null ? (
         <>
           <div
@@ -196,22 +215,53 @@ function Upload({
                 >
                   {features.map((feature, index) => {
                     const featureId = `f${index + 1}`;
+                    let featureValue;
+
+                    if (
+                      typeof feature.value === "string" &&
+                      feature.value.endsWith("Z")
+                    ) {
+                      featureValue = formatDate(feature.value);
+                    } else {
+                      featureValue = feature.value;
+                    }
                     return (
                       <div
                         key={index}
                         className=" bg-blue-400 
-                    p-2 rounded-lg h-10 mt-10"
+                        p-2 rounded-lg h-10 mt-10 relative text-sm"
                       >
                         <p>
                           {featureId} : {""}
-                          {feature.value instanceof Date
-                            ? feature.value.toLocaleDateString("de-DE")
-                            : feature.value}
+                          {featureValue
+                            ? featureValue.toLocaleString("de-DE", {
+                                year: "numeric",
+                                month: "numeric",
+                                day: "numeric",
+                              })
+                            : ""}
                         </p>
+                        <FontAwesomeIcon
+                          icon={faXmark}
+                          fontSize="24px"
+                          color="black"
+                          className="absolute top-2 right-2 cursor-pointer hover:text-red-700"
+                          onClick={() => {
+                            const newFeatures = features.filter(
+                              (_item, i) => i !== index
+                            );
+                            setFeatures(newFeatures);
+                          }}
+                        />
                       </div>
                     );
                   })}
                 </div>
+                {limitReached && (
+                  <p className="text-red-700 text-xs mt-4">
+                    Maximum limit of 16 reached!
+                  </p>
+                )}
               </div>
               <button className="ml-4">
                 <FontAwesomeIcon
@@ -259,29 +309,37 @@ function Upload({
           className="flex justify-between gap-4 items-center 
          mt-10 p-2 rounded-lg"
         >
-          <input
-            type="text"
-            placeholder="Enter a feature"
-            className="bg-slate-100 p-2 rounded-lg shadow-lg"
-            value={text}
-            maxLength={10}
-            width={200}
-            onError={() => {
-              alert("You can't add more than 10 characters");
-            }}
-            onChange={(event) => {
-              setText(event.target.value);
-            }}
-            onKeyDown={(event) => {
-              if (event.key === "Enter") {
-                setShowInput(true);
-              }
-            }}
-          />
+          <div className="flex flex-col justify-normal gap-10 relative">
+            <input
+              type="text"
+              placeholder="Enter a feature (Max 10 chars)"
+              className={`bg-slate-100 p-2 rounded-lg shadow-lg mt-3 ${
+                charLimitReached ? "border-red-500" : ""
+              }`}
+              value={text}
+              maxLength={8}
+              onChange={(event) => {
+                setCharLimitReached(false);
+                setText(event.target.value);
+              }}
+              onKeyDown={(event) => {
+                if (event.key === "Enter") {
+                  handleFeauture();
+                }
+              }}
+            />
+            {charLimitReached && (
+              <p className="text-red-700 text-xs mt-4 absolute -bottom-4">
+                Maximum limit of 8 reached!
+              </p>
+            )}
+          </div>
+
           <button
             onClick={handleFeauture}
             className="bg-green-400 rounded-lg text-black p-2 w-20 h-10
              hover:bg-green-800 hover:text-white shadow-xl"
+            hidden={text.length === 0}
           >
             Add
           </button>

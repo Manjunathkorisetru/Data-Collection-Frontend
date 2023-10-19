@@ -2,7 +2,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCircleDown } from "@fortawesome/free-solid-svg-icons";
 import JSZip from "jszip";
 import Papa from "papaparse";
-
+import formatDate from "../utils/FormatDate";
 // interface DataSet {
 //   id: number;
 //   image: string;
@@ -69,8 +69,9 @@ function DownloadDataSets({ dataSets: initialDataSets }: { dataSets: any }) {
     return result;
   });
   const dataSets = data.flat();
+
   return (
-    <div className="flex flex-col gap-4 w-screen h-screen ">
+    <div className="flex flex-col gap-4 w-screen h-screen">
       <h1 className="text-3xl font-bold text-center mt-24">
         Download Data Sets
       </h1>
@@ -85,7 +86,7 @@ function DownloadDataSets({ dataSets: initialDataSets }: { dataSets: any }) {
             className="rounded-lg lg:w-[20vw] lg:h-[20vh] md:w-[20vw] md:h-[20vh]"
           />
           <div
-            className="container p-4 w-[30vw] h-[20vh] bg-slate-200 
+            className="container p-4 w-[30vw] h-[30vh] bg-slate-200 
   rounded-xl flex flex-col justify-center items-center relative"
           >
             <p className="absolute top-1">Features</p>
@@ -95,14 +96,20 @@ function DownloadDataSets({ dataSets: initialDataSets }: { dataSets: any }) {
             >
               {dataSet.features.map((feature: any, index: number) => {
                 const featureId = `f${index + 1}`;
+                let featureValue;
+                if (feature.value.endsWith("Z")) {
+                  featureValue = formatDate(feature.value);
+                } else {
+                  featureValue = feature.value;
+                }
                 return (
                   <div
                     key={feature._id}
                     className=" bg-blue-400 
-              p-2 rounded-lg h-10 "
+                    p-1 rounded-lg text-xs text-center h-auto w-auto mt-auto mb-auto"
                   >
                     <p key={feature._id}>
-                      {featureId}:{feature.value}
+                      {featureId}:{featureValue}
                     </p>
                   </div>
                 );

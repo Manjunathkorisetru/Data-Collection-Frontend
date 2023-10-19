@@ -1,45 +1,100 @@
 import { useEffect, useState } from "react";
+import axios from "axios";
+import Banner from "../components/Banner";
 
-function Profile({ dataSets: initialDataSets }: { dataSets: any }) {
+function Profile() {
   // const [isDarkMode, setIsDarkMode] = useState(false);
+
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
-  const [emailId, setEmailId] = useState("");
+  const [email, setEmail] = useState("");
+  const [dataSets, setDataSets] = useState([]);
+  const [showProfileUpdateBanner, setShowProfileUpdateBanner] = useState(false);
 
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    // TODO: Implement the logic to update the user profile
+    try {
+      const response = await axios.put(
+        "http://localhost:3000/users/profile",
+        {
+          firstName: firstName,
+          lastName: lastName,
+          email: email,
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
+      );
+      if (response.status === 201) {
+        setShowProfileUpdateBanner(true);
+        window.scrollTo(0, 0);
+        setTimeout(() => {
+          setShowProfileUpdateBanner(false);
+        }, 3000);
+      }
+    } catch (err) {
+      console.log(err);
+    }
   };
-
   const currentUser = `${localStorage.getItem("userInfo")}@gmail.com`;
 
-  const user = initialDataSets
+  const user = dataSets
     .map((item: any) => {
       return item.email === currentUser ? item : null;
     })
     .filter((item: any) => item !== null);
 
+  const getDataSets = async () => {
+    try {
+      const response = await axios.get("http://localhost:3000/users", {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: "Bearer " + `${localStorage.getItem("token")}`,
+        },
+        params: {
+          email: localStorage.getItem("userInfo"),
+        },
+      });
+      const data = response.data;
+      setDataSets(data);
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
   useEffect(() => {
-    setEmailId(user[0].email);
-    setFirstName(user[0].firstName);
-    setLastName(user[0].lastName);
-  }, [user]);
+    if (localStorage.getItem("token")) {
+      getDataSets();
+    }
+  }, [localStorage.getItem("token")]);
+
+  useEffect(() => {
+    if (dataSets.length > 0) {
+      setEmail(user[0].email);
+      setFirstName(user[0].firstName);
+      setLastName(user[0].lastName);
+    }
+  }, [dataSets]);
 
   return (
     <div
       className={`flex flex-col justify-center gap-4
       h-screen border-10 border-b-black  items-center bg-white text-gray-900`}
     >
+      {showProfileUpdateBanner ? <Banner msg="Profile Updated" /> : null}
       {user.length > 0 ? (
         <div
           className="rounded-lg shadow-lg bg-blue-300 w-1/3 min-h-min mt-40
-      flex flex-col items-center gap-4"
+      flex flex-col items-center gap-4 p-6"
         >
           <h1 className="text-4xl font-bold mt-4">
             {user[0].firstName} {user[0].lastName}
           </h1>
-          <p className="text-lg">{`Email:${user[0].email}`}</p>
-          <p className="text-lg">{`Role:${user[0].role} `}</p>
+          <p className="text-lg">{`Email: ${user[0].email}`}</p>
+          <p className="text-lg">{`Role: ${user[0].role} `}</p>
           {/* <button
           className={`mt-4 px-4 py-2 rounded-md mb-4 bg-white text-gray-900
           }`}
@@ -86,7 +141,7 @@ function Profile({ dataSets: initialDataSets }: { dataSets: any }) {
             shadow-sm"
           />
         </div>
-        <div className="flex flex-col justify-center gap-2 items-center mt-10">
+        {/* <div className="flex flex-col justify-center gap-2 items-center mt-10">
           <label htmlFor="emailId" className="block font-medium text-black-700">
             Email
           </label>
@@ -94,27 +149,30 @@ function Profile({ dataSets: initialDataSets }: { dataSets: any }) {
             id="emailId"
             type="email"
             value={emailId}
-            onChange={(event) => setEmailId(event.target.value)}
+            onChange={(event) => {
+              setEmailId(event.target.value);
+            }}
             className="w-[20vw] h-[5vh] p-4 rounded-lg border-gray-300 
             shadow-sm"
           />
-        </div>
-        <div className="flex flex-col justify-center gap-2 items-center mt-10">
+        </div> */}
+        {/* <div className="flex flex-col justify-center gap-2 items-center mt-10">
           <label htmlFor="role" className="block font-medium text-black-700">
             Role
           </label>
-          {/* <input
+          <input
             id="role"
             type="number"
             value={role}
             onChange={(event) => setRole(parseInt(event.target.value))}
             className="w-[20vw] h-[5vh] p-4 rounded-lg border-gray-300 
             shadow-sm"
-          /> */}
-        </div>
+          />
+        </div> */}
         <button
           type="submit"
-          className={`mt-4 px-4 py-2 rounded-md mb-10 bg-white text-gray-900`}
+          className={`mt-8 px-4 py-2  rounded-md mb-10 bg-blue-900 text-white 
+          hover:bg-blue-700`}
         >
           Save Changes
         </button>
