@@ -45,6 +45,11 @@ function PreviewDataSets({
 
   return (
     <div className="flex flex-col gap-4 w-screen h-auto mb-2">
+      {localStorage.getItem("userInfo") === "adminuser" && (
+        <p className="text-red-400 text-sm mt-2">
+          *Please note: Admin cannot modify users data
+        </p>
+      )}
       <h1 className="text-3xl font-bold text-center mt-24">
         Preview of Uploaded Data Sets
       </h1>
