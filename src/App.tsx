@@ -12,10 +12,8 @@ import axios from "axios";
 
 function App() {
   const location = useLocation();
-  const [role, setRole] = useState(0); // 0 - admin, 1 - user
   const [dataSets, setDataSets] = useState([]);
   const [token, setToken] = useState(localStorage.getItem("token") || "");
-  //const [emailParam, setEmailParam] = useState("");
 
   const getDataSets = async () => {
     try {
@@ -49,8 +47,8 @@ function App() {
   }, [token]);
 
   return (
-    <div>
-      {location.pathname !== "/" && <Navbar />}
+    <div className="sm:w-screen md:w-screen lg:w-screen xl:w-screen 2xl:w-screen">
+      {location.pathname !== "/" && <Navbar setDataSets={setDataSets} />}
       <Routes>
         <Route path="/" element={<LoginPage setToken={setToken} />} />
         {/* <Route
@@ -70,15 +68,7 @@ function App() {
         <Route
           path="/dashboard"
           element={
-            token ? (
-              role === 0 ? (
-                <DashboardPage dataSets={dataSets} />
-              ) : (
-                <DashboardPage dataSets={dataSets} />
-              )
-            ) : (
-              <Navigate to="/" />
-            )
+            token ? <DashboardPage dataSets={dataSets} /> : <Navigate to="/" />
           }
         />
 

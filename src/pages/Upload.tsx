@@ -72,6 +72,10 @@ function Upload({
             email: `${userInfo}@gmail.com`,
             id: id,
           },
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: "Bearer " + `${localStorage.getItem("token")}`,
+          },
         }
       );
       if (response.status === 201) {
@@ -181,37 +185,43 @@ function Upload({
     if (featuresCount < 16) {
       setLimitReached(false);
     }
-    if (text.length >= 8) {
-      setCharLimitReached(true);
-    }
-  }, [features, text]);
+    // if (text.length > 8) {
+    //   setCharLimitReached(true);
+    // }
+  }, [features]);
 
   return (
-    <div className="flex flex-col justify-center items-center">
+    <div className="flex flex-col justify-center items-center mb-14 ">
       {showUploadBanner && <Banner msg="Uploaded" />}
       {showUpdateBanner && <Banner msg="Updated" />}
       {showDeleteBanner && <Banner msg="Deleted" />}
       {editUpload && selectedImage !== null ? (
         <>
           <div
-            className="  h-[50vh] w-screen flex justify-center 
-        mt-[40px] relative"
+            className="h-[50vh] w-screen flex justify-center 
+        mt-[40px] relative items-center sm:max-w-screen-sm 
+        md:max-w-screen-md lg:max-w-screen-lg xl:max-w-screen-xl gap-2"
           >
-            <div className="flex justify-center gap-4 w-screen">
+            <div
+              className="flex justify-center gap-4 w-screen
+          sm:gap-0 sm:mt-0 sm:min-w-min "
+            >
               <img
                 src={selectedImage ? selectedImage : ""}
                 alt="image"
-                className="rounded-lg lg:w-[30vw] lg:h-[50vh] md:w-[20vw] md:h-[20vh] shadow-2xl"
+                className="rounded-lg lg:w-[30vw] lg:h-[50vh] md:w-[25vw] md:h-[40vh]
+                sm:w-[25vw] sm:h-[40vh] shadow-lg "
               />
 
               <div
-                className="container p-4 max-w-screen-sm bg-slate-200 
-            rounded-xl flex flex-col justify-center items-center shadow-xl h-max"
+                className="container sm:max-w-screen-sm bg-slate-200 
+            rounded-xl flex flex-col justify-center items-center shadow-xl"
               >
-                <p className="absolute top-2">Features</p>
+                <p>Features</p>
                 <div
-                  className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 
-            lg:grid-cols-3 gap-2  rounded-lg w-full  mt-4 ml-10 mr-10"
+                  className="grid sm:grid-cols-2 md:grid-cols-2 xl:grid-cols-4 
+            lg:grid-cols-3 gap-2 rounded-lg w-full 
+            sm:max-h-80 sm:overflow-y-auto sm:gap-4 p-4 border-2 border-gray-400 "
                 >
                   {features.map((feature, index) => {
                     const featureId = `f${index + 1}`;
@@ -229,7 +239,7 @@ function Upload({
                       <div
                         key={index}
                         className=" bg-blue-400 
-                        p-2 rounded-lg h-10 mt-10 relative text-sm"
+                        p-2 rounded-lg h-10 mt-10 relative text-sm "
                       >
                         <p>
                           {featureId} : {""}
@@ -259,14 +269,14 @@ function Upload({
                 </div>
                 {limitReached && (
                   <p className="text-red-700 text-xs mt-4">
-                    Maximum limit of 16 reached!
+                    Maximum limit of 16 reached! (Scrollable List!) ⬆
                   </p>
                 )}
               </div>
-              <button className="ml-4">
+              <button className="ml-2 ">
                 <FontAwesomeIcon
                   icon={faTrashCan}
-                  className="ml-4"
+                  className="ml-2"
                   fontSize="24px"
                   color="red"
                   onClick={() => {
@@ -317,10 +327,15 @@ function Upload({
                 charLimitReached ? "border-red-500" : ""
               }`}
               value={text}
-              maxLength={8}
+              maxLength={9}
               onChange={(event) => {
                 setCharLimitReached(false);
-                setText(event.target.value);
+                if (event.target.value.length <= 8) {
+                  setText(event.target.value);
+                }
+                if (event.target.value.length === 9) {
+                  setCharLimitReached(true);
+                }
               }}
               onKeyDown={(event) => {
                 if (event.key === "Enter") {
@@ -330,7 +345,7 @@ function Upload({
             />
             {charLimitReached && (
               <p className="text-red-700 text-xs mt-4 absolute -bottom-4">
-                Maximum limit of 8 reached!
+                Max Char limit of 8 reached!
               </p>
             )}
           </div>

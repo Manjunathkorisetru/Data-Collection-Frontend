@@ -3,46 +3,19 @@ import { faCircleDown } from "@fortawesome/free-solid-svg-icons";
 import JSZip from "jszip";
 import Papa from "papaparse";
 import formatDate from "../utils/FormatDate";
-// interface DataSet {
-//   id: number;
-//   image: string;
-//   features: { name: string; value: string; type: string }[];
-// }
+import { useEffect, useState } from "react";
 
-const downloadData = async (dataSet: any) => {
-  const zip = new JSZip();
+function DownloadDataSets({ dataSets: initialDataSets }: { dataSets: any }) {
+  const [search, setSearch] = useState("");
+  const [dataSets, setDataSets] = useState([]);
 
-  const { id, image, features } = dataSet;
+  const downloadData = async (dataSet: any) => {
+    const zip = new JSZip();
 
-  const base64Image = `data:image/jpeg;base64,${image}`;
-
-  // Download images
-  const imageBlob = await fetch(base64Image).then((response) =>
-    response.blob()
-  );
-  zip.file(`image_${id}.jpg`, imageBlob);
-
-  // Convert features to CSV
-  const csvData = Papa.unparse(features);
-  zip.file(`features_${id}.csv`, csvData);
-
-  // Generate the zip file
-  zip.generateAsync({ type: "blob" }).then((content) => {
-    // Create a download link and trigger the download
-    const url = URL.createObjectURL(content);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = "dataSets.zip";
-    a.click();
-  });
-};
-
-const downloadAll = async (dataSets: any) => {
-  const zip = new JSZip();
-
-  for (const dataSet of dataSets) {
     const { id, image, features } = dataSet;
+
     const base64Image = `data:image/jpeg;base64,${image}`;
+
     const imageBlob = await fetch(base64Image).then((response) =>
       response.blob()
     );
@@ -50,31 +23,89 @@ const downloadAll = async (dataSets: any) => {
 
     const csvData = Papa.unparse(features);
     zip.file(`features_${id}.csv`, csvData);
+
+    zip.generateAsync({ type: "blob" }).then((content) => {
+      const url = URL.createObjectURL(content);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "dataSets.zip";
+      a.click();
+    });
+  };
+
+  const downloadAll = async (dataSets: any) => {
+    const zip = new JSZip();
+
+    for (const dataSet of dataSets) {
+      const { id, image, features } = dataSet;
+      const base64Image = `data:image/jpeg;base64,${image}`;
+      const imageBlob = await fetch(base64Image).then((response) =>
+        response.blob()
+      );
+      zip.file(`image_${id}.jpg`, imageBlob);
+
+      const csvData = Papa.unparse(features);
+      zip.file(`features_${id}.csv`, csvData);
+    }
+
+    zip.generateAsync({ type: "blob" }).then((content) => {
+      const url = URL.createObjectURL(content);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "dataSets.zip";
+      a.click();
+    });
+  };
+
+  function flattenDataSets() {
+    const data = initialDataSets.map((item: any) => {
+      const result = item.datasets.map((item: any) => {
+        return item;
+      });
+      return result;
+    });
+    setDataSets(data.flat());
   }
 
-  zip.generateAsync({ type: "blob" }).then((content) => {
-    const url = URL.createObjectURL(content);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = "dataSets.zip";
-    a.click();
-  });
-};
+  useEffect(() => {
+    if (initialDataSets.length > 0) {
+      flattenDataSets();
+    }
+  }, [initialDataSets]);
 
-function DownloadDataSets({ dataSets: initialDataSets }: { dataSets: any }) {
-  const data = initialDataSets.map((item: any) => {
-    const result = item.datasets.map((item: any) => {
-      return item;
+  const filterSearch = () => {
+    const regex = new RegExp(search, "i");
+    const result = dataSets.filter((item: any) => {
+      return regex.test(item.features[0].value);
     });
-    return result;
-  });
-  const dataSets = data.flat();
+    setDataSets(result);
+  };
 
   return (
-    <div className="flex flex-col gap-4 w-screen h-screen">
+    <div className="flex flex-col gap-4 w-screen h-auto mb-10">
       <h1 className="text-3xl font-bold text-center mt-24">
         Download Data Sets
       </h1>
+      <div>
+        <input
+          type="text"
+          placeholder="Search for the text features"
+          className="border-2 border-gray-300 rounded-md p-2 
+            xs: w-[300px] md:w-[400px] lg:w-[500px] xl:[600px] mt-10"
+          value={search}
+          onKeyDown={(e: any) => {
+            if (e.key === "Enter") {
+              filterSearch();
+            }
+            if (e.key === "Backspace") {
+              flattenDataSets();
+            }
+          }}
+          onChange={(e) => {
+            setSearch(e.target.value);
+          }}
+        />
+      </div>
       {dataSets.map((dataSet: any, index: number) => (
         <div
           key={index}
@@ -83,11 +114,11 @@ function DownloadDataSets({ dataSets: initialDataSets }: { dataSets: any }) {
           <img
             src={`data:image/jpeg;base64,${dataSet.image}`}
             alt="random"
-            className="rounded-lg lg:w-[20vw] lg:h-[20vh] md:w-[20vw] md:h-[20vh]"
+            className="rounded-lg w-[30vw] h-[30vh]"
           />
           <div
             className="container p-4 w-[30vw] h-[30vh] bg-slate-200 
-  rounded-xl flex flex-col justify-center items-center relative"
+  rounded-xl flex flex-col justify-center items-center relative sm:max-h-80 sm:overflow-y-auto"
           >
             <p className="absolute top-1">Features</p>
             <div
@@ -122,17 +153,23 @@ function DownloadDataSets({ dataSets: initialDataSets }: { dataSets: any }) {
         </div>
       ))}
 
-      <div>
-        <button
-          onClick={() => {
-            downloadAll(dataSets);
-          }}
-          className=" rounded-lg shadow-lg p-4 bg-slate-600 text-white
-         hover:bg-slate-500"
-        >
-          Download All
-        </button>
-      </div>
+      {dataSets.length > 0 ? (
+        <div>
+          <button
+            onClick={() => {
+              downloadAll(dataSets);
+            }}
+            className=" rounded-lg shadow-lg p-4 bg-slate-600 text-white
+         hover:bg-slate-500 mt-10"
+          >
+            Download All
+          </button>
+        </div>
+      ) : (
+        <div className="flex justify-center items-center mt-10">
+          <p className="text-2xl font-bold">No Data Sets Found</p>
+        </div>
+      )}
     </div>
   );
 }

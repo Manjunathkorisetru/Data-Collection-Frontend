@@ -28,25 +28,21 @@ const ImageUpload = ({
 
   return (
     <div
-      className="bg-slate-100 mx-auto min-w-[75vw] min-h-[50vh] flex gap-2 justify-center 
-    items-center rounded-xl shadow-lg mt-10"
+      className="bg-slate-100 mx-auto min-w-[75vw] min-h-[50vh] flex gap-2 justify-center
+    items-center rounded-xl shadow-lg mt-10 sm:min-w-[70vw] sm:min-h-[50vh] sm:flex-col sm:gap-4"
     >
       <input
         type="file"
         accept="image/*"
         onChange={handleImageChange}
-        className="rounded-lg p-4"
+        className="rounded-lg p-4 "
       />
       {selectedImage && (
         <img
-          // src={
-          //   selectedImage.startsWith("data:image")
-          //     ? selectedImage
-          //     : `data:image/jpeg;base64,${selectedImage}`
-          // }
           src={selectedImage}
           alt="Selected"
-          className="rounded-lg lg:w-[15vw] lg:h-[25vh] md:w-[20vw] md:h-[20vh] p-4"
+          className="rounded-lg lg:w-[15vw] lg:h-[25vh] md:w-[20vw]
+           md:h-[20vh] sm:w-[20vw] sm:h-[20vh] p-4"
         />
       )}
       {selectedImage && (

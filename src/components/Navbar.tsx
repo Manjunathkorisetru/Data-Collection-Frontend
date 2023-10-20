@@ -2,18 +2,24 @@ import { Link, useLocation } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faRightToBracket } from "@fortawesome/free-solid-svg-icons";
 
-function Navbar() {
+function Navbar({ setDataSets }: { setDataSets: any }) {
   const location = useLocation();
 
   return (
     <div className="sticky top-0 z-50">
-      <nav className="flex justify-between items-center bg-gray-800 text-white p-6">
+      <nav
+        className="flex justify-between items-center bg-gray-800 text-white 
+      p-6 sm:w-screen/2 md:w-screen lg:w-screen xl:w-screen 2xl:w-screen"
+      >
         <div>
-          <Link to="/dashboard" className="text-lg font-bold">
+          <Link to="/dashboard" className="text-lg font-bold ml-10">
             Data Collection
           </Link>
         </div>
-        <div className="flex justify-evenly w-[50vw] h-[50px] items-center">
+        <div
+          className="flex justify-evenly w-[50vw] h-[50px]  
+        items-center"
+        >
           <Link
             to="/dashboard"
             className={`hover:text-red-600 ${
@@ -37,7 +43,7 @@ function Navbar() {
           </Link>
           <Link
             to="/profile"
-            className={`hover:text-red-600 hover:scale-105${
+            className={`hover:text-red-600 hover:scale-105 ${
               location.pathname === "/profile"
                 ? "bg-slate-100 shadow-lg rounded-lg text-black p-2 hover:text-blue-950"
                 : ""
@@ -51,6 +57,7 @@ function Navbar() {
             onClick={() => {
               localStorage.removeItem("token");
               localStorage.removeItem("userInfo");
+              setDataSets([]);
             }}
           >
             <FontAwesomeIcon
