@@ -4,27 +4,10 @@ import PreviewDataSets from "../components/PreviewDataSets";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTrashCan, faXmark } from "@fortawesome/free-solid-svg-icons";
 import DatePickerComponent from "../components/DatePickerComponent";
-// import { postImage } from "../apicalls";
 import formatDate from "../utils/FormatDate";
-
 import axios from "axios";
 import Banner from "../components/Banner";
 import LoadingStatus from "../components/LoadingStatus";
-
-// interface Features {
-//   value: string | Date | null;
-//   type: string;
-//   _id: string;
-// }
-// interface DataSet {
-//   id: number;
-//   image: string;
-//   features: Features;
-// }
-
-// interface Props {
-//   dataSets: DataSet[];
-// }
 
 function Upload({
   dataSets,

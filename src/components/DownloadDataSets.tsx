@@ -83,29 +83,33 @@ function DownloadDataSets({ dataSets: initialDataSets }: { dataSets: any }) {
 
   return (
     <div className="flex flex-col gap-4 w-screen h-auto mb-10">
-      <h1 className="text-3xl font-bold text-center mt-24">
-        Download Data Sets
-      </h1>
-      <div>
-        <input
-          type="text"
-          placeholder="Search for the text features"
-          className="border-2 border-gray-300 rounded-md p-2 
+      {dataSets.length > 0 && (
+        <>
+          <h1 className="text-3xl font-bold text-center mt-24">
+            Download Data Sets
+          </h1>
+          <div>
+            <input
+              type="text"
+              placeholder="Search for the text features"
+              className="border-2 border-gray-300 rounded-md p-2 
             xs: w-[300px] md:w-[400px] lg:w-[500px] xl:[600px] mt-10"
-          value={search}
-          onKeyDown={(e: any) => {
-            if (e.key === "Enter") {
-              filterSearch();
-            }
-            if (e.key === "Backspace") {
-              flattenDataSets();
-            }
-          }}
-          onChange={(e) => {
-            setSearch(e.target.value);
-          }}
-        />
-      </div>
+              value={search}
+              onKeyDown={(e: any) => {
+                if (e.key === "Enter") {
+                  filterSearch();
+                }
+                if (e.key === "Backspace") {
+                  flattenDataSets();
+                }
+              }}
+              onChange={(e) => {
+                setSearch(e.target.value);
+              }}
+            />
+          </div>
+        </>
+      )}
       {dataSets.map((dataSet: any, index: number) => (
         <div
           key={index}
@@ -165,11 +169,7 @@ function DownloadDataSets({ dataSets: initialDataSets }: { dataSets: any }) {
             Download All
           </button>
         </div>
-      ) : (
-        <div className="flex justify-center items-center mt-10">
-          <p className="text-2xl font-bold">No Data Sets Found</p>
-        </div>
-      )}
+      ) : null}
     </div>
   );
 }
