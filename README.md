@@ -8,7 +8,9 @@ Each uploaded image contains a few features that will be annotated on the image.
 - The dashboard page provides the feature of downloading the collected datasets. Each user can download his/her own data. System admin can download individual data sets of all the users indvidually and also all together.
 - The Upload page ( a CRUD page ) which provides the functionality of uploading the images and annotating the specified features for each. It also provides the preview of the images and their features.
 - A login page that asks for authentication
-- The user profile, which summarize the information of the user as well as the role of the user. The user information can also be updated.
+- The user profile, which summarize the information of the user as well as the role of the user. The user information can also be updated
+- A Search field in the Dashboard to filter data sets by text features
+- The web app is responsive across four breakpoints: 640px (sm), 768px (md), 1024px (lg), 1280px (xl)
 
  
 
@@ -16,7 +18,7 @@ Each uploaded image contains a few features that will be annotated on the image.
 
 - **Frontend:** React.js, TypeScript, HTML, CSS, TailwindCSS
 - **Backend:** Node.js, Express.js, Mongoose
-- **Database:** MongoDB
+- **Database:** MongoDB Cloud (https://cloud.mongodb.com/)
 - **Build Tools:** Vite
 - **Package Manager:** npm
 - **Version Control:** Git, GitHub
@@ -28,7 +30,7 @@ Before you begin, ensure you have Node.js and npm (Node Package Manager) install
 
 ## Getting Started
 
-1. Clone this repository to your local machine using `git clone <repository-url>`.
+1. Clone this repository to your local machine using `https://github.com/Manjunathkorisetru/Data-Collection-Frontend.git`.
 
 2. Navigate to the project directory using the terminal or command prompt.
 
@@ -50,6 +52,6 @@ To start the development server. run the following command
 npm run dev
 ```
 
-This will start the development server, and your React application will be accessible at http://localhost:5173.
+This will start the development server, and your React application will be accessible at http://localhost:5173 (if the 5173 port is available).
 
 
