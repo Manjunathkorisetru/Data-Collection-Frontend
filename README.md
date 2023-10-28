@@ -3,6 +3,14 @@
 A Web App that is used for data collection from multiple users. This app will be used for image data collection to be formed as a dataset at the end. 
 Each uploaded image contains a few features that will be annotated on the image.
 
+## Access Data Collection Web App
+https://data-collection-web-app.netlify.app/
+
+### Credentials
+
+- **User Email** - testuser1@gmail.com
+- **Password** - Te@1
+
 ## Features Implemented
 - The main dashboard that represents a summary and statistics of the uploaded data records.
 - The dashboard page provides the feature of downloading the collected datasets. Each user can download his/her own data. System admin can download individual data sets of all the users indvidually and also all together.
