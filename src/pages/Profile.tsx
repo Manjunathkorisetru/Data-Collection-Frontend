@@ -4,19 +4,18 @@ import Banner from "../components/Banner";
 import LoadingStatus from "../components/LoadingStatus";
 
 function Profile() {
-  // const [isDarkMode, setIsDarkMode] = useState(false);
-
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
   const [dataSets, setDataSets] = useState([]);
   const [showProfileUpdateBanner, setShowProfileUpdateBanner] = useState(false);
+  const BACKEND_URL = "https://data-app-jy7j2.ondigitalocean.app/users";
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     try {
       const response = await axios.put(
-        "http://localhost:3000/users/profile",
+        `${BACKEND_URL}/profile`,
         {
           firstName: firstName,
           lastName: lastName,
@@ -50,7 +49,7 @@ function Profile() {
 
   const getDataSets = async () => {
     try {
-      const response = await axios.get("http://localhost:3000/users", {
+      const response = await axios.get(`${BACKEND_URL}`, {
         headers: {
           "Content-Type": "application/json",
           Authorization: "Bearer " + `${localStorage.getItem("token")}`,

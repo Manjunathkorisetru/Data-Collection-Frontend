@@ -31,6 +31,7 @@ function Upload({
   const [limitReached, setLimitReached] = useState(false);
   const [charLimitReached, setCharLimitReached] = useState(false);
   const userInfo = localStorage.getItem("userInfo");
+  const BACKEND_URL = "https://data-app-jy7j2.ondigitalocean.app/users";
 
   interface Feature {
     value: string | Date | null;
@@ -48,19 +49,16 @@ function Upload({
 
   const handleDelete = async (id: string) => {
     try {
-      const response = await axios.delete(
-        "http://localhost:3000/users/delete",
-        {
-          data: {
-            email: `${userInfo}@gmail.com`,
-            id: id,
-          },
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: "Bearer " + `${localStorage.getItem("token")}`,
-          },
-        }
-      );
+      const response = await axios.delete(`${BACKEND_URL}/delete`, {
+        data: {
+          email: `${userInfo}@gmail.com`,
+          id: id,
+        },
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: "Bearer " + `${localStorage.getItem("token")}`,
+        },
+      });
       if (response.status === 201) {
         window.scrollTo(0, 0);
         setShowDeleteBanner(true);
@@ -96,7 +94,7 @@ function Upload({
     if (existingDataId) {
       try {
         const response = await axios.put(
-          "http://localhost:3000/users/update",
+          `${BACKEND_URL}/update`,
           {
             email: `${userInfo}@gmail.com`,
             id: existingDataId,
@@ -125,7 +123,7 @@ function Upload({
     } else {
       try {
         const response = await axios.post(
-          "http://localhost:3000/users/upload",
+          `${BACKEND_URL}/upload`,
           {
             email: `${userInfo}@gmail.com`,
             image: selectedImage.split(",")[1],

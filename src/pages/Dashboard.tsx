@@ -8,10 +8,11 @@ export default function Dashboard({ dataSets }: { dataSets: any }) {
   const [stats, setStats] = useState<any>([]);
   const [graphData, setGraphData] = useState<any>([]);
   const userInfo = localStorage.getItem("userInfo");
+  const BACKEND_URL = "https://data-app-jy7j2.ondigitalocean.app/users";
 
   const fetchDataStats = async () => {
     try {
-      const response = await axios.get("http://localhost:3000/users/stats", {
+      const response = await axios.get(`${BACKEND_URL}/stats`, {
         headers: {
           "Content-Type": "application/json",
           Authorization: "Bearer " + `${localStorage.getItem("token")}`,
@@ -23,15 +24,12 @@ export default function Dashboard({ dataSets }: { dataSets: any }) {
       console.log(err);
     }
     try {
-      const response = await axios.get(
-        "http://localhost:3000/users/stats/graph",
-        {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: "Bearer " + `${localStorage.getItem("token")}`,
-          },
-        }
-      );
+      const response = await axios.get(`${BACKEND_URL}/stats/graph`, {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: "Bearer " + `${localStorage.getItem("token")}`,
+        },
+      });
       const data = response.data;
       setGraphData(data);
     } catch (err) {

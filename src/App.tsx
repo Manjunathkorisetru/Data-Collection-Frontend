@@ -17,15 +17,18 @@ function App() {
 
   const getDataSets = async () => {
     try {
-      const response = await axios.get("http://localhost:3000/users", {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: "Bearer " + `${localStorage.getItem("token")}`,
-        },
-        params: {
-          email: localStorage.getItem("userInfo"),
-        },
-      });
+      const response = await axios.get(
+        "https://data-app-jy7j2.ondigitalocean.app/users",
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: "Bearer " + `${localStorage.getItem("token")}`,
+          },
+          params: {
+            email: localStorage.getItem("userInfo"),
+          },
+        }
+      );
       const data = response.data;
       setDataSets(data);
     } catch (err) {

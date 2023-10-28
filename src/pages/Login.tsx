@@ -15,11 +15,12 @@ const Login = ({ setToken }: LoginProps) => {
   //const [emailError, setEmailError] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [invalidCredentials, setInvalidCredentials] = useState(false);
+  const BACKEND_URL = "https://data-app-jy7j2.ondigitalocean.app/users";
 
   const handleLogin = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     try {
-      const response = await axios.post("http://localhost:3000/users/login", {
+      const response = await axios.post(`${BACKEND_URL}/login`, {
         email: email,
         password: password,
       });
