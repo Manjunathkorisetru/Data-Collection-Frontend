@@ -76,7 +76,11 @@ function DownloadDataSets({ dataSets: initialDataSets }: { dataSets: any }) {
   const filterSearch = () => {
     const regex = new RegExp(search, "i");
     const result = dataSets.filter((item: any) => {
-      return regex.test(item.features[0].value);
+      for (let i = 0; i < item.features.length; i++) {
+        if (regex.test(item.features[i].value)) {
+          return true;
+        }
+      }
     });
     setDataSets(result);
   };
